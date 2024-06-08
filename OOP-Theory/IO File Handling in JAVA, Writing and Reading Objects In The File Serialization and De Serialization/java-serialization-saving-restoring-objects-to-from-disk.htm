@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<script>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PJQPGJF');
+</script>
+<meta content='width=device-width, initial-scale=1' name='viewport'>
+<title>Java serialization: Saving and restoring objects to/from disk | Reintech media
+</title>
+<meta content='Java serialization, Serializable, ObjectOutputStream, ObjectInputStream, saving objects, restoring objects, Java, tutorial, examples
+' name='keywords'>
+<meta content='Learn about Java serialization, a mechanism for saving and restoring objects to/from disk. This comprehensive guide covers implementing the Serializable interface, serialization and deserialization processes, practical examples, and best practices.
+' name='description'>
+<meta name="twitter:site" content="@reintech_io"/>
+
+<meta content='no-cache' name='turbolinks-cache-control'>
+<script type='application/ld+json'>{"@context":"http://schema.org","@type":"SocialMediaPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://reintech.io/media"},"headline":"Java serialization: Saving and restoring objects to/from disk","image":["https://reintech.io/assets/og_image-28d6d3fd2c13e47a47ff0b32b81655e5231efe2727393b35b29acf307a0e27c8.jpg"],"datePublished":"2023-04-18T08:30:41.395Z","dateModified":"2023-04-18T08:30:41.401Z","author":{"url":"/blog/author/arthur-c-codex","name":"Arthur C. Codex","@type":"Person"},"publisher":{"@type":"Organization","name":"Reintech"},"description":"Learn about Java serialization, a mechanism for saving and restoring objects to/from disk. This comprehensive guide covers implementing the Serializable interface, serialization and deserialization processes, practical examples, and best practices.","name":"Java serialization: Saving and restoring objects to/from disk","url":"/blog/java-serialization-saving-restoring-objects-to-from-disk"}
+</script>
+<link href='https://reintech.io/assets/home_page/_src/icons/yellow_mini_logo-3f999b5e8c490b4112514a05955f538da06eab6279ba8e8e51dd1a7b324c6a38.svg' rel='icon' type='image/svg+xml'>
+<meta content='https://reintech.io/blog/java-serialization-saving-restoring-objects-to-from-disk?authuser=1' property='og:url'>
+<meta content='website' property='og:type'>
+<meta content='Java serialization: Saving and restoring objects to/from disk | Reintech media
+' property='og:title'>
+<meta content='Learn about Java serialization, a mechanism for saving and restoring objects to/from disk. This comprehensive guide covers implementing the Serializable interface, serialization and deserialization processes, practical examples, and best practices.
+' property='og:description'>
+<meta content='https://reintech.io/assets/og_image-28d6d3fd2c13e47a47ff0b32b81655e5231efe2727393b35b29acf307a0e27c8.jpg' property='og:image'>
+<meta content='198317151088375' property='fb:app_id'>
+
+<link rel="stylesheet" media="all" href="https://reintech.io/assets/media-9268c510adbd4e86c6f424c06801e657cdf390c498ee2bf5f39ae97076ea82f8.css" data-turbolinks-track="reload" />
+<script src="https://reintech.io/assets/media-4388c52abb5b3a14bb3dc3766f300f84d4f9730ab9d09b289d1b297c2138e988.js" data-turbolinks-track="reload"></script>
+<script src="https://reintech.io/packs/media-cebddf7827ee8085a268.js"></script>
+<meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="nHQFDMzZ0hyg6c9ApJoPlcRvbTlkWNbD0pgDyFX3XmuCMeUR+BbfINvrkHa6lNtBA9WbGT60E6oU/jEG8r7Juw==" />
+<link rel="stylesheet" href="/prism.css">
+<script src="/prism.js"></script>
+
+<meta content='article' property='og:type'>
+<meta content='Java serialization: Saving and restoring objects to/from disk' property='og:title'>
+<meta content='Java serialization is a mechanism for saving and restoring objects to/from disk. This tutorial covers implementing the Serializable interface, using ObjectOutputStream and ObjectInputStream classes for serialization and deserialization, and exploring practical examples and best practices.' property='og:description'>
+<meta content='2023-04-18 08:30:41 UTC' property='article:published_time'>
+<meta content='2023-04-18 08:30:41 UTC' property='article:modified_time'>
+<meta content='Arthur C. Codex' name='author'>
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+      "@type": "Organization",
+        "name": "Reintech",
+          "url": "https://reintech.io"
+            }
+              </script>
+<meta name="facebook-domain-verification" content="rp0my1g2g2hu5b1tprxk2c9zgac983" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital@0;1&display=swap" rel="stylesheet">
+
+
+</head>
+<body data-locale='en' data-turbolinks='false'>
+<header>
+<div class='media-header d-flex flex-wrap justify-content-between align-items-center'>
+<a class="logo" href="/blog"><img class="logo" alt="Reintech logo" src="https://reintech.io/assets/media/logotype-1f401e7d307c0b33313fa0492eefe277e22c7792bbcbcfcf5ea80fa0c74527ec.svg" />
+</a><a href="/"><span class='nav-media show-hide mr-2 ua active'>Home</span>
+</a><a class="nav-media active show-hide en" href="/login">Sign in</a>
+<a class="nav-media show-hide en" id="apply" target="_blank" href="/#contact_us">Contact us</a>
+<p class='drop hide-show'>
+<a aria-controls="header-menu" aria-expanded="false" data-toggle="collapse" role="button" href="#header-menu"><img alt="burger menu icon" src="https://reintech.io/assets/media/burgermenu_icon-663fcc7777349bda49a287fe585bc58b8ffdc83fcd4798983e5190fe64895a35.png" />
+</a></p>
+</div>
+<div class='collapse' id='header-menu'>
+<ul class='nav flex-column mt-4'>
+<li class='nav-item'>
+<a class="nav-link menu-link en" href="/login">Sign in</a>
+</li>
+<div class='dropdown-divider'></div>
+<li class='nav-item'>
+<a class="nav-link menu-link en" target="_blank" href="/#contact_us">Contact us</a>
+</li>
+<div class='dropdown-divider'></div>
+<li class='nav-item'>
+<a class="nav-link menu-link en" href="/">Home</a>
+</li>
+<div class='dropdown-divider'></div>
+<li class='nav-item'>
+<div class='d-flex justify-content-between'>
+<span class='nav-link menu-link en active active_language'>English</span>
+<a class="nav-link menu-link ua default" href="/media">Українська</a>
+</div>
+</li>
+</ul>
+</div>
+
+</header>
+<main role='main'>
+<script src='https://www.google.com/recaptcha/api.js?render=6LexrLgcAAAAAOO1cCSveob78Y5_rsFhsGdEocaj'></script>
+<div class='main-media-page'>
+<div class='categories d-flex'>
+<a class="btn btn-outline-primary grey-btn mr-2 active en" type="button" href="/blog">All</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/recruiting-remote-developers">Recruiting</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/developers">Engineering</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/career">Career</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/managing-remote-developers">Managing</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/soft-skills">Soft Skills</a>
+<a class="btn btn-outline-primary grey-btn mr-2  en" type="button" href="/blog/success-stories">Success stories</a>
+</div>
+</div>
+<div class='show-media-page'>
+<div class='row main-content'>
+<div class='main-post col-lg-8'>
+<div class='main-post'>
+<div class='post-information d-flex flex-wrap align-items-center'>
+<span class='mr-3 mb-1 mt-1 grey'>April 18, 2023</span>
+<span class='mr-3 mb-1 mt-1 grey en'>2 min read</span>
+<span class='mr-3 mb-1 mt-1 grey d-none en'>views 5710</span>
+<span class='mr-3 mb-1 mt-1 grey en'><a href="/blog/author/arthur-c-codex">Arthur C. Codex</a></span>
+<a href="/blog/java-serialization-saving-restoring-objects-to-from-disk#chats-box"><span class='mr-3 mb-1 mt-1 grey en'>chats: 2</span>
+</a><a type="button" class="mb-1 mt-1 en" href="/blog/developers"><span class='mr-2 purple en'>Engineering</span>
+</a><a type="button" class="mb-1 mt-1 en" href="/blog?technology=java"><span class='mr-2 green en'>Java</span>
+</a><div data-react-class="media/Heart" data-react-props="{&quot;post_id&quot;:&quot;2367&quot;,&quot;ids&quot;:[],&quot;count&quot;:285,&quot;main&quot;:true,&quot;locale&quot;:&quot;en&quot;}" data-react-cache-id="media/Heart-0" class="wrapper-small-heart-main"></div>
+
+</div>
+
+<h1 class='mt-1 en'>Java serialization: Saving and restoring objects to/from disk</h1>
+<div class='post-body'>
+<p>In this tutorial, you will learn about Java serialization - a mechanism for saving and restoring objects to/from disk. Java serialization is essential when you need to persist the state of an object or transfer it over a network. This guide will walk you through the process of serializing and deserializing objects in Java, using practical examples and code snippets.<p></p></p>
+
+<p>Before diving into the tutorial, it is essential to have a basic understanding of Java programming.</p>
+
+<h2>Table of Contents</h2>
+<ol>
+    <li>Understanding Java Serialization</li>
+    <li>Implementing Serializable Interface</li>
+    <li>Serialization Process</li>
+    <li>Deserialization Process</li>
+    <li>Examples: Saving and Restoring Objects</li>
+    <li>Common Issues and Best Practices</li>
+    <li>Conclusion</li>
+</ol>
+
+<h2>1. Understanding Java Serialization</h2>
+
+<p>Java serialization is a process of converting an object's state into a byte stream, which can then be saved to a file, database, or transferred over a network. The reverse process, called deserialization, is used to recreate the object from the byte stream.</p>
+
+<p>Java's <code>ObjectOutputStream</code> and <code>ObjectInputStream</code> classes are used to perform serialization and deserialization, respectively. These classes are part of the <code>java.io</code> package.</p>
+
+<h2>2. Implementing Serializable Interface</h2>
+
+<p>To make an object serializable, it must implement the <code>java.io.Serializable</code> interface. This interface is a marker interface, which means it doesn't have any methods to implement. Its purpose is to indicate that a class can be serialized and deserialized.</p>
+
+<p>Here is an example of a simple serializable class:</p>
+
+<pre><code class="language-java">import java.io.Serializable;
+
+public class Employee implements Serializable {
+    private String name;
+    private int age;
+    private double salary;
+
+    public Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    // Getters and setters
+}
+</code></pre>
+
+<h2>3. Serialization Process</h2>
+
+<p>To serialize an object, follow these steps:</p>
+
+<ol>
+    <li>Create a <code>FileOutputStream</code> to write the serialized object to a file.</li>
+    <li>Create an <code>ObjectOutputStream</code> and wrap it around the <code>FileOutputStream</code>.</li>
+    <li>Call the <code>writeObject()</code> method on the <code>ObjectOutputStream</code> to serialize the object.</li>
+    <li>Close the streams.</li>
+</ol>
+
+<p>Here is an example of serializing an <code>Employee</code> object:</p>
+
+<pre><code class="language-java">import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+public class SerializeEmployee {
+    public static void main(String[] args) {
+        Employee emp = new Employee("John Doe", 30, 50000);
+        try {
+            FileOutputStream fileOut = new FileOutputStream("employee.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(emp);
+            out.close();
+            fileOut.close();
+            System.out.println("Serialized data is saved in employee.ser");
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
+}
+</code></pre>
+
+<h2>4. Deserialization Process</h2>
+
+<p>To deserialize an object, follow these steps:</p>
+
+<ol>
+    <li>Create a <code>FileInputStream</code> to read the serialized object from a file.</li>
+    <li>Create an <code>ObjectInputStream</code> and wrap it around the <code>FileInputStream</code>.</li>
+    <li>Call the <code>readObject()</code> method on the <code>ObjectInputStream</code> to deserialize the object.</li>
+    <li>Close the streams.</li>
+</ol>
+
+<p>Here is an example of deserializing an <code>Employee</code> object:</p>
+
+<pre><code class="language-java">import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+public class DeserializeEmployee {
+    public static void main(String[] args) {
+        Employee emp = null;
+        try {
+            FileInputStream fileIn = new FileInputStream("employee.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            emp = (Employee) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+            return;
+        } catch (ClassNotFoundException c) {
+            System.out.println("Employee class not found");
+            c.printStackTrace();
+            return;
+        }
+        System.out.println("Deserialized Employee...");
+        System.out.println("Name: " + emp.getName());
+        System.out.println("Age: " + emp.getAge());
+        System.out.println("Salary: " + emp.getSalary());
+    }
+}
+</code></pre>
+
+<h2>5. Examples: Saving and Restoring Objects</h2>
+
+<p>The following examples demonstrate how to save and restore objects using Java serialization:</p>
+
+<ol>
+    <li><b>Example 1:</b> Serializing and deserializing a list of objects</li>
+    <li><b>Example 2:</b> Serializing and deserializing objects with inheritance</li>
+    <li><b>Example 3:</b> Serializing and deserializing objects with transient fields</li>
+</ol>
+
+<p>These examples will help you to understand the serialization process in a more practical way. If required, you can always <a href="https://reintech.io/hire-java-developers">hire remote Java developers</a> to assist you with your projects.</p>
+
+<h2>6. Common Issues and Best Practices</h2>
+
+<p>While working with Java serialization, you may encounter some common issues or pitfalls. Here are some best practices to avoid these problems:</p>
+
+<ul>
+    <li>Always implement a <code>serialVersionUID</code> field in your serializable classes to maintain version control.</li>
+    <li>Use the <code>transient</code> keyword for fields that should not be serialized (e.g., file handles, database connections).</li>
+    <li>Be cautious when serializing large objects, as it may consume a significant amount of memory and disk space.</li>
+    <li>Consider using other serialization libraries, like Google's Protocol Buffers or JSON, for better performance and interoperability.</li>
+</ul>
+
+<h2>7. Conclusion</h2>
+
+<p>In this tutorial, you learned about Java serialization - a mechanism for saving and restoring objects to/from disk. You saw how to implement the Serializable interface and use ObjectOutputStream and ObjectInputStream classes for serialization and deserialization. You also explored some practical examples and best practices to avoid common issues.</p>
+
+<p>Java serialization is a powerful concept that can help you persist object states and transfer them across networks. With the knowledge gained from this tutorial, you can effectively use serialization in your projects. If you need additional help, consider working with a <a href="https://reintech.io/hire-java-developers">remote Java development team</a> to boost your skills and expertise.</p>
+</div>
+<script>
+  function encodePreElements() {
+    var pre = document.getElementsByTagName('code');
+    for(var i = 0; i < pre.length; i++) {
+      var txt = pre[i].innerHTML;
+      txt = txt.replaceAll('&quot;', '"')
+      if(txt.indexOf('>') >=0 && txt.indexOf('<') >= 0){
+        var encoded = htmlEncode(txt);
+  
+        encoded = encoded.replaceAll('&lt;br&gt;', '');
+        encoded = encoded.replaceAll('&lt;p&gt;', '');
+        encoded = encoded.replaceAll('&lt;/p&gt;', '');
+        pre[i].innerHTML = encoded;
+      }
+    }
+  };
+  
+  function htmlEncode(value) {
+    var div = document.createElement('div');
+    var text = document.createTextNode(value);
+    div.appendChild(text);
+    return div.innerHTML;
+  }
+</script>
+<script>
+  encodePreElements();
+</script>
+<div data-react-class="media/OutdatedContent" data-react-props="{&quot;post_id&quot;:&quot;2367&quot;,&quot;url&quot;:&quot;/media/java-serialization-saving-restoring-objects-to-from-disk/create_outdated_report&quot;,&quot;reports&quot;:[],&quot;locale&quot;:&quot;en&quot;}" data-react-cache-id="media/OutdatedContent-0" class="wrapper-outdated-content mt-2 mb-2"></div>
+
+<div class='social-links-block d-flex flex-wrap'>
+<span class='mr-3 mt-2 mb-2 en'>Share:</span>
+<div aria-label='Basic example' class='btn-group btn-group-sm mt-2 mb-2' role='group'>
+<a class="en btn btn-outline-success" data-network="facebook" onclick="window.open(&#39;https://www.facebook.com/sharer/sharer.php?u=https://reintech.io/media/java-serialization-saving-restoring-objects-to-from-disk&#39;, &#39;facebook-share-dialog&#39;, &#39;width=626,height=436&#39;); return false;" href="#">Facebook</a>
+<a class="en btn btn-outline-success" target="_blank" href="http://twitter.com/share?text=Java serialization: Saving and restoring objects to/from disk&amp;url=https://reintech.io/media/java-serialization-saving-restoring-objects-to-from-disk">Twitter</a>
+<a class="en btn btn-outline-success" target="_blank" href="https://www.linkedin.com/sharing/share-offsite/?url=https://reintech.io/media/java-serialization-saving-restoring-objects-to-from-disk">LinkedIn</a>
+</div>
+<div data-react-class="media/BigHeart" data-react-props="{&quot;post_id&quot;:&quot;2367&quot;,&quot;ids&quot;:[],&quot;count&quot;:285,&quot;locale&quot;:&quot;en&quot;}" data-react-cache-id="media/BigHeart-0" class="wrapper-big-heart mt-2 mb-2"></div>
+
+</div>
+<div data-react-class="media/chat_posts/ChatBox" data-react-props="{&quot;locale&quot;:&quot;en&quot;,&quot;url&quot;:&quot;/post_chats&quot;,&quot;post_id&quot;:&quot;java-serialization-saving-restoring-objects-to-from-disk&quot;,&quot;user_uid&quot;:&quot;brLUprK5T6yQd3xC&quot;,&quot;not_available&quot;:false,&quot;server_time&quot;:&quot;2024-05-15 07:28&quot;,&quot;chats&quot;:[{&quot;id&quot;:5595,&quot;summary&quot;:&quot;The user requested guidance for Java serialization examples mentioned in an article, and received instructions and code snippets for serializing lists, objects with inheritance, and objects with transient fields.&quot;,&quot;updated_at&quot;:&quot;2024-03-17 05:00&quot;,&quot;created_at&quot;:&quot;2024-03-17 01:21:49&quot;,&quot;user_uid&quot;:&quot;wVRHUz2MyrYD9Eih&quot;,&quot;messages&quot;:[{&quot;id&quot;:27875,&quot;body&quot;:&quot;Certainly! Below are guidance and sample code snippets for each of the three examples mentioned in the article:\n\n### Example 1: Serializing and Deserializing a List of Objects\nTo serialize a list of objects, you would follow the same process as serializing a single object, but you would pass the list itself to the `writeObject()` method.\n\njava\nimport java.io.*;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class SerializeListExample {\n    public static void main(String[] args) {\n        List\u0026lt;Employee\u003e employeeList = new ArrayList\u0026lt;\u003e();\n        employeeList.add(new Employee(\&quot;Alice\&quot;, 28, 70000));\n        employeeList.add(new Employee(\&quot;Bob\&quot;, 35, 80000));\n\n        try {\n            FileOutputStream fileOut = new FileOutputStream(\&quot;employeeList.ser\&quot;);\n            ObjectOutputStream out = new ObjectOutputStream(fileOut);\n            out.writeObject(employeeList);\n            out.close();\n            fileOut.close();\n            System.out.println(\&quot;Serialized list of employees is saved in employeeList.ser\&quot;);\n        } catch (IOException i) {\n            i.printStackTrace();\n        }\n    }\n}\n\n\nFor deserializing the list:\n\njava\nimport java.io.*;\nimport java.util.List;\n\npublic class DeserializeListExample {\n    public static void main(String[] args) {\n        List\u0026lt;Employee\u003e employeeList = null;\n        try {\n            FileInputStream fileIn = new FileInputStream(\&quot;employeeList.ser\&quot;);\n            ObjectInputStream in = new ObjectInputStream(fileIn);\n            employeeList = (List\u0026lt;Employee\u003e) in.readObject();\n            in.close();\n            fileIn.close();\n        } catch (IOException i) {\n            i.printStackTrace();\n            return;\n        } catch (ClassNotFoundException c) {\n            System.out.println(\&quot;Employee class not found\&quot;);\n            c.printStackTrace();\n            return;\n        }\n        System.out.println(\&quot;Deserialized Employee List...\&quot;);\n        for (Employee emp : employeeList) {\n            System.out.println(\&quot;Name: \&quot; + emp.getName());\n            System.out.println(\&quot;Age: \&quot; + emp.getAge());\n            System.out.println(\&quot;Salary: \&quot; + emp.getSalary());\n        }\n    }\n}\n\n\n### Example 2: Serializing and Deserializing Objects with Inheritance\nIf you&#39;re serializing an object of a class that extends another class, both the superclass and the subclass need to be serializable.\n\njava\nimport java.io.Serializable;\n\npublic class Person implements Serializable {\n    private String name;\n    private int age;\n\n    // Constructors, getters, setters\n}\n\npublic class Employee extends Person {\n    private double salary;\n\n    // Constructors, getters, setters\n}\n\nUse the same serialization and deserialization code as before, making an `Employee` instance and following the process.\n\n### Example 3: Serializing and Deserializing Objects with Transient Fields\nTransient fields are not serialized. Declare any field you don&#39;t want to be serialized as `transient`.\n\njava\nimport java.io.Serializable;\n\npublic class Employee implements Serializable {\n    private String name;\n    private int age;\n    private transient double salary;  // Transient field won&#39;t be serialized\n\n    // Constructors, getters, setters\n}\n\n\nWhen deserializing, the transient fields will not be restored and will have their default values (e.g., 0 for primitive data types).\n\nRemember to implement `Serializable` in all these cases, handle `IOException` and `ClassNotFoundException` appropriately, and use getters and setters as you would in a typical Java class.\n\nFor a comprehensive guide, including more detailed code and explanations, you might want to look for additional Java serialization tutorials or refer to the Java documentation.&quot;,&quot;sender&quot;:&quot;gpt&quot;,&quot;created_at&quot;:&quot;2024-03-17 01:23:09&quot;},{&quot;id&quot;:27874,&quot;body&quot;:&quot;sure , i&#39;d like some guidance for these eamples&quot;,&quot;sender&quot;:&quot;user&quot;,&quot;created_at&quot;:&quot;2024-03-17 01:22:52&quot;},{&quot;id&quot;:27873,&quot;body&quot;:&quot;\u003cp\u003eThe article mentions that there are examples provided to illustrate the saving and restoring of objects using Java serialization in Section 5, labeled \&quot;Examples: Saving and Restoring Objects\&quot;. However, specific code for these examples is not provided within the article content. The list states:\u003c/p\u003e\n\n\u003col\u003e\n    \u003cli\u003e\u003cb\u003eExample 1:\u003c/b\u003e Serializing and deserializing a list of objects\u003c/li\u003e\n    \u003cli\u003e\u003cb\u003eExample 2:\u003c/b\u003e Serializing and deserializing objects with inheritance\u003c/li\u003e\n    \u003cli\u003e\u003cb\u003eExample 3:\u003c/b\u003e Serializing and deserializing objects with transient fields\u003c/li\u003e\n\u003c/ol\u003e\n\n\u003cp\u003eIf you are looking for practical sample code for these scenarios, you&#39;ll need to create your own examples or seek additional resources that provide them. Would you like guidance on how to create these examples yourself or information on where to find such examples?\u003c/p\u003e&quot;,&quot;sender&quot;:&quot;gpt&quot;,&quot;created_at&quot;:&quot;2024-03-17 01:22:07&quot;},{&quot;id&quot;:27872,&quot;body&quot;:&quot;where are the examples&quot;,&quot;sender&quot;:&quot;user&quot;,&quot;created_at&quot;:&quot;2024-03-17 01:21:49&quot;}]},{&quot;id&quot;:3643,&quot;summary&quot;:&quot;The user is seeking guidance on implementing Java serialization and adding a serialVersionUID to their classes.&quot;,&quot;updated_at&quot;:&quot;2024-02-02 20:00&quot;,&quot;created_at&quot;:&quot;2024-02-02 16:12:53&quot;,&quot;user_uid&quot;:&quot;fFy212vt5Eu5sely&quot;,&quot;messages&quot;:[{&quot;id&quot;:16685,&quot;body&quot;:&quot;\u003cp\u003ePer implementare un campo \u003ccode\u003eserialVersionUID\u003c/code\u003e in una classe Java che implementa l&#39;interfaccia \u003ccode\u003eSerializable\u003c/code\u003e, è sufficiente aggiungere una dichiarazione di campo statico e final con un valore univoco di tipo \u003ccode\u003elong\u003c/code\u003e. Il \u003ccode\u003eserialVersionUID\u003c/code\u003e serve come versione della classe ai fini della serializzazione. Ecco un esempio:\u003c/p\u003e\n\n\u003cpre\u003e\u003ccode class=\&quot;language-java\&quot;\u003eimport java.io.Serializable;\n\npublic class ExampleClass implements Serializable {\n    \n    private static final long serialVersionUID = 1L; // A unique version number\n    \n    // Resto della classe...\n}\n\u003c/code\u003e\u003c/pre\u003e\n\n\u003cp\u003eIl valore del \u003ccode\u003eserialVersionUID\u003c/code\u003e dovrebbe essere modificato solo quando si apportano modifiche incompatibili alla classe, come modificare il tipo di un campo o l&#39;ordine di lettura/scrittura degli oggetti durante la serializzazione. In genere, questo valore viene generato automaticamente da molti IDE, ma può essere anche assegnato manualmente. È importante mantenere costante il valore di \u003ccode\u003eserialVersionUID\u003c/code\u003e a meno che non si voglia gestire in modo esplicito le variazioni di versione della classe serializzabile.\u003c/p\u003e&quot;,&quot;sender&quot;:&quot;gpt&quot;,&quot;created_at&quot;:&quot;2024-02-02 16:15:35&quot;},{&quot;id&quot;:16684,&quot;body&quot;:&quot;come implemento un serialVersionUID&quot;,&quot;sender&quot;:&quot;user&quot;,&quot;created_at&quot;:&quot;2024-02-02 16:15:11&quot;},{&quot;id&quot;:16683,&quot;body&quot;:&quot;\u003cp\u003ePer applicare il sistema di serializzazione Java, è necessario seguire alcune fasi fondamentali. Di seguito sono riportati i passaggi per serializzare e deserializzare un oggetto in Java:\u003c/p\u003e\n\n\u003col\u003e\n    \u003cli\u003e\u003cstrong\u003eImplementazione dell&#39;interfaccia Serializable:\u003c/strong\u003e La classe dell&#39;oggetto che si desidera serializzare deve implementare l&#39;interfaccia \u003ccode\u003ejava.io.Serializable\u003c/code\u003e. Non è necessario implementare nessun metodo poiché è un&#39;interfaccia marker.\u003c/li\u003e\n\n    \u003cli\u003e\u003cstrong\u003eSerializzazione di un oggetto:\u003c/strong\u003e Usare le classi \u003ccode\u003eFileOutputStream\u003c/code\u003e e \u003ccode\u003eObjectOutputStream\u003c/code\u003e per serializzare l&#39;oggetto e scriverlo su file o su un altro flusso di output.\u003c/li\u003e\n\u003cpre\u003e\u003ccode class=\&quot;language-java\&quot;\u003eFileOutputStream fileOut = new FileOutputStream(\&quot;oggetto.ser\&quot;);\nObjectOutputStream out = new ObjectOutputStream(fileOut);\nout.writeObject(oggetto);\nout.close();\nfileOut.close();\u003c/code\u003e\u003c/pre\u003e\n\n    \u003cli\u003e\u003cstrong\u003eDeserializzazione di un oggetto:\u003c/strong\u003e Usare le classi \u003ccode\u003eFileInputStream\u003c/code\u003e e \u003ccode\u003eObjectInputStream\u003c/code\u003e per leggere un oggetto serializzato da un file o da un altro flusso di input e convertirlo di nuovo in un oggetto.\u003c/li\u003e\n\u003cpre\u003e\u003ccode class=\&quot;language-java\&quot;\u003eFileInputStream fileIn = new FileInputStream(\&quot;oggetto.ser\&quot;);\nObjectInputStream in = new ObjectInputStream(fileIn);\nObject oggetto = (TipoOggetto) in.readObject();\nin.close();\nfileIn.close();\u003c/code\u003e\u003c/pre\u003e\n\u003c/ol\u003e\n\n\u003cp\u003eRicordati di gestire le eccezioni che possono verificarsi durante la serializzazione e deserializzazione, come \u003ccode\u003eIOException\u003c/code\u003e e \u003ccode\u003eClassNotFoundException\u003c/code\u003e. Inoltre, utilizza il modificatore \u003ccode\u003etransient\u003c/code\u003e per i campi che non si desidera serializzare.\u003c/p\u003e\n\n\u003cp\u003ePer iniziare la serializzazione in un progetto reale, potrebbe essere necessario definire gli oggetti che si vogliono serializzare, implementare l&#39;interfaccia Serializable e poi scrivere il codice necessario per serializzare e deserializzare quegli oggetti seguendo gli esempi di codice forniti nell&#39;articolo.\u003c/p\u003e&quot;,&quot;sender&quot;:&quot;gpt&quot;,&quot;created_at&quot;:&quot;2024-02-02 16:13:16&quot;},{&quot;id&quot;:16682,&quot;body&quot;:&quot;Come applico questo sistema?&quot;,&quot;sender&quot;:&quot;user&quot;,&quot;created_at&quot;:&quot;2024-02-02 16:12:53&quot;}]}]}" data-react-cache-id="media/chat_posts/ChatBox-0" class="wrapper-chat_box" id="chats-box"></div>
+</div>
+<div class='main-post apply-subscribe-block' style='padding: 0'>
+</div>
+<div class='central-author-column'>
+<div class='banner-mobile'>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3829025371632739"
+     crossorigin="anonymous"></script>                                            
+  <!-- blog ad -->                                                           
+       <ins class="adsbygoogle"                                                 
+       style="display:block"                                                  
+        data-ad-client="ca-pub-3829025371632739"                             
+          data-ad-slot="8442875499"                                          
+               data-ad-format="auto"                                            
+             data-full-width-responsive="true"></ins>                       
+                <script>                                                     
+                  (adsbygoogle = window.adsbygoogle || []).push({});         
+                  </script>
+
+</div>
+<div class='dropdown-divider mt-4 mb-4'></div>
+</div>
+</div>
+<div class='col-lg-4'>
+<div class='reply-to-block'>
+<p>If you're interested in enhancing this article or becoming a contributing author, we'd love to hear from you.</p>
+<p>Please contact Sasha at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f1c0e1c070e2f1d0a06011b0a0c07410600">[email&#160;protected]</a> to discuss the opportunity further or to inquire about adding a direct link to your resource. We welcome your collaboration and contributions!</p>
+</div>
+<div class='terms'>
+<h3>Glossary</h3>
+<h5 class='mt-3'><a href="/term/java-serialization-guide">Java Serialization</a></h5>
+<p>Java Serialization is a feature of the Java programming language that allows converting the state of an object into a byte stream, which can be persisted to a disk or sent over a network. Later, this byte stream can be used to create a copy of the object. This mechanism is particularly useful when you want to 'save' the state of an object or transmit it over a network for remote method invocation (RMI) or for marshalling and unmarshalling arguments and parameters in a remote communication system.</p>
+<h5 class='mt-3'><a href="/term/understanding-objectinputstream-class-java">ObjectInputStream Class</a></h5>
+<p>The ObjectInputStream class in Java is used to deserialize objects. This class reads primitive data types and graphs of Java objects from an InputStream. The objects must have been written by an ObjectOutputStream. This is essential when you need to restore the state of an object or receive it from a network. <a href='https://docs.oracle.com/javase/7/docs/api/java/io/ObjectInputStream.html'>Learn more about ObjectInputStream Class</a>.</p>
+<h5 class='mt-3'><a href="/term/understanding-objectoutputstream-class-java">ObjectOutputStream Class</a></h5>
+<p>The ObjectOutputStream class in Java is used to serialize objects. This class writes primitive data types and graphs of Java objects to an OutputStream. The objects can be read using an ObjectInputStream. This plays a crucial role when you need to save the state of an object or transfer it across networks. <a href='https://docs.oracle.com/javase/7/docs/api/java/io/ObjectOutputStream.html'>Learn more about ObjectOutputStream Class</a>.</p>
+<h5 class='mt-3'><a href="/term/implementing-serializable-interface-java">Serializable Interface</a></h5>
+<p>The Serializable interface in Java is a marker interface that indicates a class can be serialized and deserialized. It does not contain any methods for a class to implement. To make an object serializable in Java, the class must implement this interface. This is crucial when you need to save the state of an object or transfer it across networks. <a href='https://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html'>Learn more about Serializable Interface</a>.</p>
+</div>
+<div class='mt-5'>
+<p>
+<a href="/hire-database-java-developers-aws-cognito">Optimize Your Engineering Management with Remote Database &amp; Java Developers Skilled in AWS Cognito</a>
+</p>
+<p>
+<a href="/hire-java-database-aws-codecommit-developers">Hire Expert Remote Java Developers with Database and AWS CodeCommit Skills</a>
+</p>
+<p>
+<a href="/hire-remote-java-database-camera-api-developers">Elevate Your Tech Team with Expert Remote Java Developers Proficient in Databases and Camera API</a>
+</p>
+</div>
+
+<div class='banner-right'>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3829025371632739"
+     crossorigin="anonymous"></script>                                            
+  <!-- blog ad -->                                                           
+       <ins class="adsbygoogle"                                                 
+       style="display:block"                                                  
+        data-ad-client="ca-pub-3829025371632739"                             
+          data-ad-slot="8442875499"                                          
+               data-ad-format="auto"                                            
+             data-full-width-responsive="true"></ins>                       
+                <script>                                                     
+                  (adsbygoogle = window.adsbygoogle || []).push({});         
+                  </script>
+
+</div>
+</div>
+</div>
+</div>
+<div class='show-media-second-part'>
+<div class='row mr-0'>
+<div class='col-lg-8 pr-0'>
+</div>
+<div class='col-lg-4'></div>
+</div>
+</div>
+
+</main>
+<script type="text/javascript" src="https://secure.food9wave.com/js/218872.js" ></script>
+<noscript><img alt="secure.food" src="https://secure.food9wave.com/218872.png" style="display:none;" /></noscript>
+
+<footer>
+<div class='media-footer'>
+<div class='desctop'>
+<div class='row'>
+<div class='col-lg-8'>
+<a href="/blog"><img alt="Reintech logo" src="https://reintech.io/assets/media/logo_footer-11f826977160fbe430f0dc0516912582bb93bf2fe55252eac336ba13b0aa36ef.svg" />
+</a></div>
+<div class='col-lg-4'></div>
+</div>
+<div class='row categories'>
+<div class='col-lg-2'>
+<p class='label'>Categories</p>
+<p class='name'>
+<a class="en" href="/blog/recruiting-remote-developers">Recruiting</a>
+</p>
+<p class='name'>
+<a class="en" href="/blog/developers">Engineering</a>
+</p>
+<p class='name'>
+<a class="en" href="/blog/career">Career</a>
+</p>
+<p class='name'>
+<a class="en" href="/blog/managing-remote-developers">Managing</a>
+</p>
+<p class='name'>
+<a class="en" href="/blog/soft-skills">Soft Skills</a>
+</p>
+<p class='name'>
+<a class="en" href="/blog/success-stories">Success stories</a>
+</p>
+<p class='name'>
+<a class="en" href="/glossary">Glossary</a>
+</p>
+</div>
+<div class='col-lg-2'>
+<p class='label en'>Social Media</p>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.instagram.com/reintech.io/">Instagram</a>
+</p>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.facebook.com/reintech.io">Facebook</a>
+</p>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.linkedin.com/company/reintech-ltd">LinkedIn</a>
+</p>
+<p class='name en'>
+<a target="_blank" class="en" href="https://twitter.com/reintech_io">Twitter</a>
+</p>
+</div>
+<div class='col-lg-4'>
+<p class='label en'>Apply as Developer</p>
+<a class="apply en" href="/developer/apply"><span>Apply</span>
+</a></div>
+<div class='col-lg-4'>
+<p class='label en'>Contact us</p>
+<a class="apply en" href="/#contact_us">Send us a message</a>
+</div>
+</div>
+</div>
+<div class='planshet'>
+<div class='row'>
+<div class='col-6'>
+<a href="/blog"><img alt="Reintech logo" src="https://reintech.io/assets/media/logo_footer-11f826977160fbe430f0dc0516912582bb93bf2fe55252eac336ba13b0aa36ef.svg" />
+</a></div>
+<div class='col-6 language d-none'>
+<div class='dropdown drop'>
+<a class="dropdownMenuLink dropdown-toggle" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" role="button" href="#">Eng</a>
+<div aria-labelledby='dropdownMenuLink' class='dropdown-menu'>
+<span class='dropdown-item en'>English</span>
+<a class="dropdown-item ua" href="/media">Українська</a>
+</div>
+</div>
+</div>
+</div>
+<div class='row categories'>
+<div class='col-sm-6 mb-4'>
+<p class='label en'>Categories</p>
+<div class='row'>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/recruiting-remote-developers">Recruiting</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/developers">Engineering</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/career">Career</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/managing-remote-developers">Managing</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/soft-skills">Soft Skills</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a class="en" href="/blog/success-stories">Success stories</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name'>
+<a class="en" href="/glossary">Glossary</a>
+</p>
+</div>
+</div>
+</div>
+<div class='col-sm-6 mb-4'>
+<p class='label en'>Social Media</p>
+<div class='row'>
+<div class='col-6'>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.instagram.com/reintech.io/">Instagram</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.facebook.com/reintech.io">Facebook</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a target="_blank" class="en" href="https://www.linkedin.com/company/reintech-ltd">LinkedIn</a>
+</p>
+</div>
+<div class='col-6'>
+<p class='name en'>
+<a target="_blank" class="en" href="https://twitter.com/reintech_io">Twitter</a>
+</p>
+</div>
+</div>
+</div>
+<div class='col-sm-6 mb-4'>
+<p class='label en'>Apply as Developer</p>
+<a class="apply en" href="/developer/apply"><span>Apply</span>
+</a></div>
+<div class='col-sm-6 mb-4'>
+<p class='label en'>Contact us</p>
+<a class="apply en" href="/#contact_us">Send us a message</a>
+</div>
+</div>
+</div>
+</div>
+<div class='dropdown-divider'></div>
+<div class='privacy-policy'>
+<a class="en" style="color: #918CA0;"  href="/privacy-policy">Privacy Policy</a> <a class="en" style="color: #918CA0;" href="/terms">Terms</a> <br>
+<span class="en" style="color: #918CA0;">© Reintech 2018 – 2024</span>
+</div>
+
+</footer>
+</body>
+</html>
